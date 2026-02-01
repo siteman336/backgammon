@@ -3,165 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Backgammon</title>
+<title>تخته نرد ساده</title>
 <style>
-body { margin:0; font-family:sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; background:#f4f1e6; }
-#board { width: 95vw; height: 60vw; background:#d49b6a; position:relative; display:flex; flex-wrap:wrap; border: 4px solid #654321; }
-.triangle { width:4.16%; height:50%; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); position:absolute; }
-.triangle.top { top:0; }
-.triangle.bottom { bottom:0; transform: rotate(180deg); }
-.triangle.light { background:#eee; }
+body {
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background:#f4f1e6;
+}
+#board {
+  display:flex;
+  flex-direction:row; /* افقی */
+  justify-content:center;
+  align-items:flex-start;
+  width:95vw;
+  max-width:1000px;
+  height:50vw;
+  background:#d49b6a;
+  border:4px solid #654321;
+  position:relative;
+}
+
+/* نیمه‌های تخته */
+.half {
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  width:40%;
+  height:100%;
+  margin:0 5%;
+  position:relative;
+}
+
+/* هر ۶ خانه در بالا و پایین */
+.triangle-row {
+  display:flex;
+  justify-content:space-between;
+  height:50%;
+}
+
+/* مثلث‌ها */
+.triangle {
+  width:14.5%; /* تقریبی برای 6 خانه */
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  background:#eee;
+  position:relative;
+}
+
+/* راس مثلث بالا و پایین */
+.triangle.top { transform: rotate(180deg); }
 .triangle.dark { background:#444; }
-.piece { width:4.16%; height:4.16%; border-radius:50%; position:absolute; touch-action: none; }
-.piece.light { background:#fff; border:2px solid #ccc; }
-.piece.dark { background:#000; border:2px solid #333; }
-#diceBtn { position:absolute; top:5px; right:5px; padding:10px 15px; background:#fff; border:2px solid #333; border-radius:5px; font-size:16px; }
-#diceModal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; padding:20px; border:3px solid #333; z-index:100; }
-#diceModal input { width:40px; margin:0 5px; text-align:center; font-size:18px; }
-#diceModal button { margin-top:10px; padding:5px 10px; font-size:16px; }
-.diceFace { width:8%; height:15%; border-radius:10%; background:#fff; border:2px solid #333; position:absolute; display:flex; justify-content:center; align-items:center; font-size:18px; font-weight:bold; }
-#undoBtn, #finishBtn { position:absolute; bottom:5px; right:5px; padding:8px 12px; font-size:16px; margin-left:5px; display:none; border-radius:5px; border:2px solid #333; background:#fff; }
+.triangle.light { background:#eee; }
 </style>
 </head>
 <body>
+<div id="board">
 
-<div id="board"></div>
-<button id="diceBtn">ریختن تاس</button>
+  <!-- نیمه اول -->
+  <div class="half">
+    <div class="triangle-row top">
+      <div class="triangle dark top"></div>
+      <div class="triangle light top"></div>
+      <div class="triangle dark top"></div>
+      <div class="triangle light top"></div>
+      <div class="triangle dark top"></div>
+      <div class="triangle light top"></div>
+    </div>
+    <div class="triangle-row bottom">
+      <div class="triangle dark"></div>
+      <div class="triangle light"></div>
+      <div class="triangle dark"></div>
+      <div class="triangle light"></div>
+      <div class="triangle dark"></div>
+      <div class="triangle light"></div>
+    </div>
+  </div>
 
-<div id="diceModal">
-  <div>تاس اول: <input type="number" id="dice1" min="1" max="6" value="1"></div>
-  <div>تاس دوم: <input type="number" id="dice2" min="1" max="6" value="1"></div>
-  <button id="rollDice">ریختن روی تخته</button>
+  <!-- نیمه دوم -->
+  <div class="half">
+    <div class="triangle-row top">
+      <div class="triangle light top"></div>
+      <div class="triangle dark top"></div>
+      <div class="triangle light top"></div>
+      <div class="triangle dark top"></div>
+      <div class="triangle light top"></div>
+      <div class="triangle dark top"></div>
+    </div>
+    <div class="triangle-row bottom">
+      <div class="triangle light"></div>
+      <div class="triangle dark"></div>
+      <div class="triangle light"></div>
+      <div class="triangle dark"></div>
+      <div class="triangle light"></div>
+      <div class="triangle dark"></div>
+    </div>
+  </div>
+
 </div>
-
-<button id="undoBtn">بازگشت</button>
-<button id="finishBtn">تمام</button>
-
-<audio id="diceSound" src="https://freesound.org/data/previews/146/146725_1251012-lq.mp3"></audio>
-
-<script>
-const board = document.getElementById('board');
-const diceBtn = document.getElementById('diceBtn');
-const diceModal = document.getElementById('diceModal');
-const rollDice = document.getElementById('rollDice');
-const dice1 = document.getElementById('dice1');
-const dice2 = document.getElementById('dice2');
-const diceSound = document.getElementById('diceSound');
-const undoBtn = document.getElementById('undoBtn');
-const finishBtn = document.getElementById('finishBtn');
-
-const triangles = [];
-const pieces = [];
-let moveHistory = [];
-let diceRolled = false;
-
-// 🔹 ایجاد مثلث‌ها
-for(let i=0;i<24;i++){
-  const t = document.createElement('div');
-  t.classList.add('triangle');
-  t.classList.add(i<12?'top':'bottom');
-  t.classList.add(i%2===0?'light':'dark');
-  t.style.left = `${(i%12)*8.33}%`;
-  board.appendChild(t);
-  triangles.push(t);
-}
-
-// 🔹 قرار دادن مهره‌ها
-const startPositions = [
-  {color:'light', count:2, pos:0},
-  {color:'dark', count:5, pos:11},
-  {color:'dark', count:3, pos:7},
-  {color:'light', count:5, pos:23},
-  {color:'dark', count:5, pos:12},
-  {color:'light', count:3, pos:16},
-];
-
-startPositions.forEach(sp=>{
-  for(let i=0;i<sp.count;i++){
-    const p = document.createElement('div');
-    p.classList.add('piece', sp.color);
-    board.appendChild(p);
-    p.style.bottom = `${(sp.color==='light'?0:50) + i*4.2}%`;
-    p.style.left = `${(sp.pos%12)*8.33}%`;
-    pieces.push(p);
-
-    // 🔹 حرکت آزاد با لمس
-    let offsetX, offsetY, dragging=false;
-    p.addEventListener('pointerdown', e=>{
-      dragging=true;
-      offsetX = e.clientX - p.getBoundingClientRect().left;
-      offsetY = e.clientY - p.getBoundingClientRect().top;
-      p.setPointerCapture(e.pointerId);
-    });
-    p.addEventListener('pointermove', e=>{
-      if(dragging){
-        p.style.left = `${((e.clientX - offsetX)/board.offsetWidth)*100}%`;
-        p.style.top = `${((e.clientY - offsetY)/board.offsetHeight)*100}%`;
-      }
-    });
-    p.addEventListener('pointerup', e=>{
-      if(dragging){
-        // ذخیره حرکت برای بازگشت
-        moveHistory.push({piece:p, left:p.style.left, top:p.style.top});
-        undoBtn.style.display='inline-block';
-        finishBtn.style.display='inline-block';
-      }
-      dragging=false;
-    });
-  }
-});
-
-// 🔹 دکمه ریختن تاس
-diceBtn.addEventListener('click', ()=>{ diceModal.style.display='block'; });
-rollDice.addEventListener('click', ()=>{
-  diceModal.style.display='none';
-  const d1 = dice1.value;
-  const d2 = dice2.value;
-  diceRolled = true;
-
-  const diceFaces = [
-    {num:d1, pos:10}, 
-    {num:d2, pos:20}
-  ];
-  diceFaces.forEach(df=>{
-    const d = document.createElement('div');
-    d.classList.add('diceFace');
-    d.innerText = df.num;
-    d.style.left = `${df.pos}%`;
-    d.style.top = '20%';
-    board.appendChild(d);
-  });
-
-  // 🔹 صدا
-  diceSound.currentTime=0;
-  diceSound.play();
-
-  // دکمه ریختن تاس مخفی شود تا Finish زده شود
-  diceBtn.style.display='none';
-});
-
-// 🔹 دکمه بازگشت
-undoBtn.addEventListener('click', ()=>{
-  if(moveHistory.length>0){
-    const lastMove = moveHistory.pop();
-    lastMove.piece.style.left = lastMove.left;
-    lastMove.piece.style.top = lastMove.top;
-  }
-});
-
-// 🔹 دکمه تمام
-finishBtn.addEventListener('click', ()=>{
-  // پاک شدن تاس‌ها
-  const diceElems = document.querySelectorAll('.diceFace');
-  diceElems.forEach(d=>board.removeChild(d));
-
-  moveHistory=[];
-  undoBtn.style.display='none';
-  finishBtn.style.display='none';
-  diceBtn.style.display='inline-block';
-  diceRolled=false;
-});
-</script>
-
 </body>
 </html>
