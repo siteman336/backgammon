@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تخته نرد با مهره</title>
+<title>تخته نرد با مهره‌ها</title>
 <style>
 body {
   margin:0;
@@ -59,23 +59,21 @@ body {
 
 /* مهره‌ها */
 .piece {
-  width:80%; /* نسبتی از مثلث */
-  aspect-ratio:1/1; /* دایره */
+  width:80%;
+  aspect-ratio:1/1;
   border-radius:50%;
   position:absolute;
   left:50%;
   transform:translateX(-50%);
 }
-
 .piece.light { background:#fff; border:2px solid #ccc; }
 .piece.dark { background:#000; border:2px solid #333; }
-
 </style>
 </head>
 <body>
 <div id="board">
 
-  <!-- نیمه اول -->
+  <!-- نیمه چپ -->
   <div class="half">
     <div class="triangle-row top">
       <div class="triangle dark top" data-triangle="1"></div>
@@ -95,7 +93,7 @@ body {
     </div>
   </div>
 
-  <!-- نیمه دوم -->
+  <!-- نیمه راست -->
   <div class="half">
     <div class="triangle-row top">
       <div class="triangle light top" data-triangle="13"></div>
@@ -118,30 +116,44 @@ body {
 </div>
 
 <script>
-// 🔹 موقعیت مهره‌ها بر اساس توضیح تو
+// 🔹 داده مهره‌ها طبق توضیح جدید تو
 const piecesData = [
-  {color:'light', triangle:1, count:2},
-  {color:'light', triangle:12, count:5},
-  {color:'light', triangle:8, count:3, bottom:true},
-  {color:'light', triangle:6, count:5, bottom:true},
-  {color:'dark', triangle:1, count:2, bottom:true},
-  {color:'dark', triangle:12, count:5, bottom:true},
-  {color:'dark', triangle:8, count:3},
-  {color:'dark', triangle:6, count:5},
+  // تخته سمت راست بالا
+  {color:'light', half:'right', row:'top', triangle:1, count:2},
+  {color:'dark', half:'right', row:'top', triangle:6, count:5},
+
+  // تخته سمت چپ بالا
+  {color:'dark', half:'left', row:'top', triangle:2, count:3},
+  {color:'light', half:'left', row:'top', triangle:6, count:5},
+
+  // تخته سمت راست پایین
+  {color:'dark', half:'right', row:'bottom', triangle:1, count:2},
+  {color:'light', half:'right', row:'bottom', triangle:6, count:5},
+
+  // تخته سمت چپ پایین
+  {color:'light', half:'left', row:'bottom', triangle:2, count:3},
+  {color:'dark', half:'left', row:'bottom', triangle:6, count:5},
 ];
 
 const board = document.getElementById('board');
 const triangles = document.querySelectorAll('.triangle');
 
 piecesData.forEach(pd=>{
-  const triangle = Array.from(triangles).find(t=>Number(t.dataset.triangle)===pd.triangle);
+  // پیدا کردن مثلث درست
+  let triangle;
+  if(pd.half==='left') {
+    triangle = Array.from(triangles).filter(t=>t.closest('.half')===board.children[0]).find(t=>Number(t.dataset.triangle)===pd.triangle);
+  } else {
+    triangle = Array.from(triangles).filter(t=>t.closest('.half')===board.children[1]).find(t=>Number(t.dataset.triangle)===pd.triangle);
+  }
   if(!triangle) return;
+
   for(let i=0;i<pd.count;i++){
     const p = document.createElement('div');
     p.classList.add('piece', pd.color);
     triangle.appendChild(p);
-    // موقعیت مهره در مثلث
-    if(pd.bottom) {
+    // موقعیت روی مثلث
+    if(pd.row==='top') {
       p.style.bottom = `${i*18}%`;
     } else {
       p.style.top = `${i*18}%`;
