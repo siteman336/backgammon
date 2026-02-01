@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تخته نرد با مهره‌ها</title>
+<title>تخته نرد اصلاح‌شده</title>
 <style>
 body {
   margin:0;
@@ -15,7 +15,7 @@ body {
 }
 #board {
   display:flex;
-  flex-direction:row; /* افقی */
+  flex-direction:row; /* عمودی */
   justify-content:center;
   align-items:flex-start;
   width:95vw;
@@ -50,6 +50,10 @@ body {
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   background:#eee;
   position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:center;
 }
 
 /* راس مثلث بالا و پایین */
@@ -57,17 +61,26 @@ body {
 .triangle.dark { background:#444; }
 .triangle.light { background:#eee; }
 
+/* Container مهره‌ها */
+.pieces-container {
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+}
+
 /* مهره‌ها */
 .piece {
   width:80%;
   aspect-ratio:1/1;
   border-radius:50%;
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
+  margin:2px 0;
+  flex-shrink:0;
 }
 .piece.light { background:#fff; border:2px solid #ccc; }
 .piece.dark { background:#000; border:2px solid #333; }
+
 </style>
 </head>
 <body>
@@ -76,63 +89,60 @@ body {
   <!-- نیمه چپ -->
   <div class="half">
     <div class="triangle-row top">
-      <div class="triangle dark top" data-triangle="1"></div>
-      <div class="triangle light top" data-triangle="2"></div>
-      <div class="triangle dark top" data-triangle="3"></div>
-      <div class="triangle light top" data-triangle="4"></div>
-      <div class="triangle dark top" data-triangle="5"></div>
-      <div class="triangle light top" data-triangle="6"></div>
+      <div class="triangle dark top" data-triangle="1"><div class="pieces-container"></div></div>
+      <div class="triangle light top" data-triangle="2"><div class="pieces-container"></div></div>
+      <div class="triangle dark top" data-triangle="3"><div class="pieces-container"></div></div>
+      <div class="triangle light top" data-triangle="4"><div class="pieces-container"></div></div>
+      <div class="triangle dark top" data-triangle="5"><div class="pieces-container"></div></div>
+      <div class="triangle light top" data-triangle="6"><div class="pieces-container"></div></div>
     </div>
     <div class="triangle-row bottom">
-      <div class="triangle dark" data-triangle="12"></div>
-      <div class="triangle light" data-triangle="11"></div>
-      <div class="triangle dark" data-triangle="10"></div>
-      <div class="triangle light" data-triangle="9"></div>
-      <div class="triangle dark" data-triangle="8"></div>
-      <div class="triangle light" data-triangle="7"></div>
+      <div class="triangle dark" data-triangle="12"><div class="pieces-container"></div></div>
+      <div class="triangle light" data-triangle="11"><div class="pieces-container"></div></div>
+      <div class="triangle dark" data-triangle="10"><div class="pieces-container"></div></div>
+      <div class="triangle light" data-triangle="9"><div class="pieces-container"></div></div>
+      <div class="triangle dark" data-triangle="8"><div class="pieces-container"></div></div>
+      <div class="triangle light" data-triangle="7"><div class="pieces-container"></div></div>
     </div>
   </div>
 
   <!-- نیمه راست -->
   <div class="half">
     <div class="triangle-row top">
-      <div class="triangle light top" data-triangle="13"></div>
-      <div class="triangle dark top" data-triangle="14"></div>
-      <div class="triangle light top" data-triangle="15"></div>
-      <div class="triangle dark top" data-triangle="16"></div>
-      <div class="triangle light top" data-triangle="17"></div>
-      <div class="triangle dark top" data-triangle="18"></div>
+      <div class="triangle light top" data-triangle="13"><div class="pieces-container"></div></div>
+      <div class="triangle dark top" data-triangle="14"><div class="pieces-container"></div></div>
+      <div class="triangle light top" data-triangle="15"><div class="pieces-container"></div></div>
+      <div class="triangle dark top" data-triangle="16"><div class="pieces-container"></div></div>
+      <div class="triangle light top" data-triangle="17"><div class="pieces-container"></div></div>
+      <div class="triangle dark top" data-triangle="18"><div class="pieces-container"></div></div>
     </div>
     <div class="triangle-row bottom">
-      <div class="triangle light" data-triangle="24"></div>
-      <div class="triangle dark" data-triangle="23"></div>
-      <div class="triangle light" data-triangle="22"></div>
-      <div class="triangle dark" data-triangle="21"></div>
-      <div class="triangle light" data-triangle="20"></div>
-      <div class="triangle dark" data-triangle="19"></div>
+      <div class="triangle light" data-triangle="24"><div class="pieces-container"></div></div>
+      <div class="triangle dark" data-triangle="23"><div class="pieces-container"></div></div>
+      <div class="triangle light" data-triangle="22"><div class="pieces-container"></div></div>
+      <div class="triangle dark" data-triangle="21"><div class="pieces-container"></div></div>
+      <div class="triangle light" data-triangle="20"><div class="pieces-container"></div></div>
+      <div class="triangle dark" data-triangle="19"><div class="pieces-container"></div></div>
     </div>
   </div>
 
 </div>
 
 <script>
-// 🔹 داده مهره‌ها طبق توضیح جدید تو
+// 🔹 مهره‌ها طبق توضیح جدید و شمارش از سمت راست هر نیمه
 const piecesData = [
-  // تخته سمت راست بالا
-  {color:'light', half:'right', row:'top', triangle:1, count:2},
-  {color:'dark', half:'right', row:'top', triangle:6, count:5},
-
-  // تخته سمت چپ بالا
-  {color:'dark', half:'left', row:'top', triangle:2, count:3},
-  {color:'light', half:'left', row:'top', triangle:6, count:5},
-
-  // تخته سمت راست پایین
-  {color:'dark', half:'right', row:'bottom', triangle:1, count:2},
-  {color:'light', half:'right', row:'bottom', triangle:6, count:5},
-
-  // تخته سمت چپ پایین
-  {color:'light', half:'left', row:'bottom', triangle:2, count:3},
-  {color:'dark', half:'left', row:'bottom', triangle:6, count:5},
+  // نیمه راست بالا
+  {half:'right', row:'top', triangle:1, color:'light', count:2},
+  {half:'right', row:'top', triangle:6, color:'dark', count:5},
+  // نیمه چپ بالا
+  {half:'left', row:'top', triangle:2, color:'dark', count:3},
+  {half:'left', row:'top', triangle:6, color:'light', count:5},
+  // نیمه راست پایین
+  {half:'right', row:'bottom', triangle:1, color:'dark', count:2},
+  {half:'right', row:'bottom', triangle:6, color:'light', count:5},
+  // نیمه چپ پایین
+  {half:'left', row:'bottom', triangle:2, color:'light', count:3},
+  {half:'left', row:'bottom', triangle:6, color:'dark', count:5},
 ];
 
 const board = document.getElementById('board');
@@ -140,24 +150,14 @@ const triangles = document.querySelectorAll('.triangle');
 
 piecesData.forEach(pd=>{
   // پیدا کردن مثلث درست
-  let triangle;
-  if(pd.half==='left') {
-    triangle = Array.from(triangles).filter(t=>t.closest('.half')===board.children[0]).find(t=>Number(t.dataset.triangle)===pd.triangle);
-  } else {
-    triangle = Array.from(triangles).filter(t=>t.closest('.half')===board.children[1]).find(t=>Number(t.dataset.triangle)===pd.triangle);
-  }
+  let halfDiv = (pd.half==='left')? board.children[0] : board.children[1];
+  let triangle = Array.from(halfDiv.querySelectorAll('.triangle')).find(t=>Number(t.dataset.triangle)===pd.triangle);
   if(!triangle) return;
-
+  const container = triangle.querySelector('.pieces-container');
   for(let i=0;i<pd.count;i++){
     const p = document.createElement('div');
     p.classList.add('piece', pd.color);
-    triangle.appendChild(p);
-    // موقعیت روی مثلث
-    if(pd.row==='top') {
-      p.style.bottom = `${i*18}%`;
-    } else {
-      p.style.top = `${i*18}%`;
-    }
+    container.appendChild(p);
   }
 });
 </script>
