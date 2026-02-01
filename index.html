@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تخته نرد ساده</title>
+<title>تخته نرد با مهره</title>
 <style>
 body {
   margin:0;
@@ -56,6 +56,20 @@ body {
 .triangle.top { transform: rotate(180deg); }
 .triangle.dark { background:#444; }
 .triangle.light { background:#eee; }
+
+/* مهره‌ها */
+.piece {
+  width:80%; /* نسبتی از مثلث */
+  aspect-ratio:1/1; /* دایره */
+  border-radius:50%;
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+.piece.light { background:#fff; border:2px solid #ccc; }
+.piece.dark { background:#000; border:2px solid #333; }
+
 </style>
 </head>
 <body>
@@ -64,43 +78,77 @@ body {
   <!-- نیمه اول -->
   <div class="half">
     <div class="triangle-row top">
-      <div class="triangle dark top"></div>
-      <div class="triangle light top"></div>
-      <div class="triangle dark top"></div>
-      <div class="triangle light top"></div>
-      <div class="triangle dark top"></div>
-      <div class="triangle light top"></div>
+      <div class="triangle dark top" data-triangle="1"></div>
+      <div class="triangle light top" data-triangle="2"></div>
+      <div class="triangle dark top" data-triangle="3"></div>
+      <div class="triangle light top" data-triangle="4"></div>
+      <div class="triangle dark top" data-triangle="5"></div>
+      <div class="triangle light top" data-triangle="6"></div>
     </div>
     <div class="triangle-row bottom">
-      <div class="triangle dark"></div>
-      <div class="triangle light"></div>
-      <div class="triangle dark"></div>
-      <div class="triangle light"></div>
-      <div class="triangle dark"></div>
-      <div class="triangle light"></div>
+      <div class="triangle dark" data-triangle="12"></div>
+      <div class="triangle light" data-triangle="11"></div>
+      <div class="triangle dark" data-triangle="10"></div>
+      <div class="triangle light" data-triangle="9"></div>
+      <div class="triangle dark" data-triangle="8"></div>
+      <div class="triangle light" data-triangle="7"></div>
     </div>
   </div>
 
   <!-- نیمه دوم -->
   <div class="half">
     <div class="triangle-row top">
-      <div class="triangle light top"></div>
-      <div class="triangle dark top"></div>
-      <div class="triangle light top"></div>
-      <div class="triangle dark top"></div>
-      <div class="triangle light top"></div>
-      <div class="triangle dark top"></div>
+      <div class="triangle light top" data-triangle="13"></div>
+      <div class="triangle dark top" data-triangle="14"></div>
+      <div class="triangle light top" data-triangle="15"></div>
+      <div class="triangle dark top" data-triangle="16"></div>
+      <div class="triangle light top" data-triangle="17"></div>
+      <div class="triangle dark top" data-triangle="18"></div>
     </div>
     <div class="triangle-row bottom">
-      <div class="triangle light"></div>
-      <div class="triangle dark"></div>
-      <div class="triangle light"></div>
-      <div class="triangle dark"></div>
-      <div class="triangle light"></div>
-      <div class="triangle dark"></div>
+      <div class="triangle light" data-triangle="24"></div>
+      <div class="triangle dark" data-triangle="23"></div>
+      <div class="triangle light" data-triangle="22"></div>
+      <div class="triangle dark" data-triangle="21"></div>
+      <div class="triangle light" data-triangle="20"></div>
+      <div class="triangle dark" data-triangle="19"></div>
     </div>
   </div>
 
 </div>
+
+<script>
+// 🔹 موقعیت مهره‌ها بر اساس توضیح تو
+const piecesData = [
+  {color:'light', triangle:1, count:2},
+  {color:'light', triangle:12, count:5},
+  {color:'light', triangle:8, count:3, bottom:true},
+  {color:'light', triangle:6, count:5, bottom:true},
+  {color:'dark', triangle:1, count:2, bottom:true},
+  {color:'dark', triangle:12, count:5, bottom:true},
+  {color:'dark', triangle:8, count:3},
+  {color:'dark', triangle:6, count:5},
+];
+
+const board = document.getElementById('board');
+const triangles = document.querySelectorAll('.triangle');
+
+piecesData.forEach(pd=>{
+  const triangle = Array.from(triangles).find(t=>Number(t.dataset.triangle)===pd.triangle);
+  if(!triangle) return;
+  for(let i=0;i<pd.count;i++){
+    const p = document.createElement('div');
+    p.classList.add('piece', pd.color);
+    triangle.appendChild(p);
+    // موقعیت مهره در مثلث
+    if(pd.bottom) {
+      p.style.bottom = `${i*18}%`;
+    } else {
+      p.style.top = `${i*18}%`;
+    }
+  }
+});
+</script>
+
 </body>
 </html>
